@@ -18,13 +18,20 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
+    [SerializeField]Text bestScoreText;
     
+    private SavedataManager savedataManager;
     // Start is called before the first frame update
     void Start()
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
+
+        if( SavedataManager.Instance != null ){
+            savedataManager = SavedataManager.Instance.GetComponent<SavedataManager>();
+            SetBestScore();
+        }
+
         int[] pointCountArray = new [] {1,1,2,2,5,5};
         for (int i = 0; i < LineCount; ++i)
         {
@@ -57,7 +64,7 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene("End");
             }
         }
     }
@@ -66,11 +73,27 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        savedataManager.NowUser.score = m_Points;
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if( savedataManager.HighScoreUser.score < m_Points ){
+            savedataManager.HighScoreUser.name = savedataManager.NowUser.name;
+            savedataManager.HighScoreUser.score = savedataManager.NowUser.score ;
+
+            savedataManager.SaveData();
+        }
+    }
+
+    private void SetBestScore(){
+        Debug.Log( "HighScore Name  : "+savedataManager.HighScoreUser.name );
+        Debug.Log( "HighScore Score : "+savedataManager.HighScoreUser.score );
+        if( savedataManager.HighScoreUser != null ){
+            bestScoreText.text = string.Format( "Best Score : {0} : {1}" ,  savedataManager.HighScoreUser.name , savedataManager.HighScoreUser.score );
+        }
     }
 }
