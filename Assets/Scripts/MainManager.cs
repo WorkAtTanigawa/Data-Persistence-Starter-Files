@@ -21,6 +21,7 @@ public class MainManager : MonoBehaviour
     [SerializeField]Text bestScoreText;
     
     private SavedataManager savedataManager;
+    private SaveData saveData;
     // Start is called before the first frame update
     void Start()
     {
@@ -73,7 +74,6 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
-        savedataManager.NowUser.score = m_Points;
     }
 
     public void GameOver()
@@ -81,19 +81,17 @@ public class MainManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
 
-        if( savedataManager.HighScoreUser.score < m_Points ){
-            savedataManager.HighScoreUser.name = savedataManager.NowUser.name;
-            savedataManager.HighScoreUser.score = savedataManager.NowUser.score ;
-
-            savedataManager.SaveData();
-        }
+        savedataManager.SaveData(m_Points);
     }
 
     private void SetBestScore(){
-        Debug.Log( "HighScore Name  : "+savedataManager.HighScoreUser.name );
-        Debug.Log( "HighScore Score : "+savedataManager.HighScoreUser.score );
-        if( savedataManager.HighScoreUser != null ){
-            bestScoreText.text = string.Format( "Best Score : {0} : {1}" ,  savedataManager.HighScoreUser.name , savedataManager.HighScoreUser.score );
+        // Debug.Log( "HighScore Name  : "+savedataManager.HighScoreUser.name );
+        // Debug.Log( "HighScore Score : "+savedataManager.HighScoreUser.score );
+        if( savedataManager.ranking.Count > 0 ){
+            var rank1 = savedataManager.ranking[0] ;
+            bestScoreText.text = string.Format( "Best Score : {0} : {1}" ,  rank1.name , rank1.score );
+        }else{
+            bestScoreText.text = string.Format( "Best Score : {0} : {1}" ,  "-----" , 0 );
         }
     }
 }
